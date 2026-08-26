@@ -2,16 +2,19 @@ import hashlib
 import json
 import time
 from datetime import datetime, timezone
-from pathlib import Path
 
+import boto3
 import requests
+from botocore.exceptions import ClientError
 
 HEADERS = {"User-Agent": "ontrac-coverage-watch/0.1 (philiphvu13@gmail.com)"}
 TIMEOUT = 60
 RETRIES = 4
 BACKOFF_SECONDS = 3
 PAUSE_SECONDS = 1
-OUT_ROOT = Path("out")
+
+BUCKET = "unclephil-ontrac-coverage-raw"
+s3 = boto3.client("s3")
 
 MAP_BASE = "https://www.ontrac.com/wp-content/themes/ontrac/assets/images/map/"
 ZIP_PDF = "https://www.ontrac.com/wp-content/uploads/pdf/ontrac-area-surcharge-zip-codes.pdf"
@@ -69,16 +72,24 @@ def validate(source, body, content_type):
         raise ValueError("only {} bytes".format(len(body)))
 
 
-def store(key, body):
-    path = OUT_ROOT / key
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(body)
-    return path
+def exists(key):
+    try:
+        s3.head_object(Bucket=BUCKET, Key=key)
+        return True
+    except ClientError as error:
+        if error.response["Error"]["Code"] in ("404", "NoSuchKey"):
+            return False
+        raise
+
+
+def store(key, body, content_type):
+    s3.put_object(Bucket=BUCKET, Key=key, Body=body, ContentType=content_type)
+    return key
 
 
 def main():
     dt = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    print("run dt={}".format(dt))
+    print("run dt={}  bucket={}".format(dt, BUCKET))
 
     for source in SOURCES:
         slug = source["slug"]
@@ -88,7 +99,7 @@ def main():
         for filename, url in source["files"]:
             key = build_key(slug, dt, filename)
 
-            if (OUT_ROOT / key).exists():
+            if exists(key):
                 print("  skip  {}".format(filename))
                 continue
 
@@ -97,7 +108,7 @@ def main():
                 body = response.content
                 content_type = response.headers.get("Content-Type", "")
                 validate(source, body, content_type)
-                store(key, body)
+                store(key, body, source["content_type"])
 
                 digest = hashlib.sha256(body).hexdigest()
                 meta = {
@@ -112,7 +123,7 @@ def main():
                     "sha256": digest,
                 }
                 meta_key = build_key(slug, dt, filename + ".meta.json")
-                store(meta_key, json.dumps(meta, indent=2).encode("utf-8"))
+                store(meta_key, json.dumps(meta, indent=2).encode("utf-8"), "application/json")
 
                 print("  ok    {:<24} {:>8} bytes".format(filename, len(body)))
 
