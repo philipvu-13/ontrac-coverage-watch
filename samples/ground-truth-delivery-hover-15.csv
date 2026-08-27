@@ -1,7 +1,7 @@
 state,transit_days,note
 NC,1,eastern nc is 2 days
 SC,1,
-VA,1,roughly even split western VA at 1 day and eastern VA at 2 days
+VA,1|2,roughly even split western VA at 1 day and eastern VA at 2 days
 GA,1,
 TX,3,
 CO,5,
