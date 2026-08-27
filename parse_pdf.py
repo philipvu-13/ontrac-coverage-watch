@@ -9,7 +9,7 @@ OUT = sys.argv[2] if len(sys.argv) > 2 else "out/zip_surcharge_rows.csv"
 
 ZIP_RE = re.compile(r"^\d{5}$")
 DATE_RE = re.compile(r"Effective\s+(.+)$")
-
+FIELDS = ["zip5", "tier", "effective_date", "page", "provenance", "confidence"]
 
 def tier_of(header):
     if header.startswith("Extended"):
@@ -58,9 +58,7 @@ def main():
     rows = parse(PDF)
 
     with open(OUT, "w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=[
-            "zip5", "tier", "effective_date", "page", "provenance", "confidence",
-        ])
+        writer = csv.DictWriter(handle, fieldnames=FIELDS)
         writer.writeheader()
         writer.writerows(rows)
 

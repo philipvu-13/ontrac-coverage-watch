@@ -3,3 +3,5 @@ out/
 __pycache__/
 build/
 function.zip
+build2/
+extract.zip

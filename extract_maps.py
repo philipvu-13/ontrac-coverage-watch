@@ -46,6 +46,11 @@ SORT_CENTERS = {
     18: ("Chicago", "IL"),
 }
 
+MAP_FIELDS = [
+    "sort_center", "sort_center_state", "map_index", "state", "outcome",
+    "points_total", "points_agreeing", "split", "provenance", "confidence",
+    "dt", "source_key",
+]
 
 def classify(pixel):
     best = "no_data"
@@ -70,8 +75,8 @@ def sample(image, x, y):
     return votes.most_common(1)[0][0]
 
 
-def load_map(s3, index):
-    key = "raw/source=coverage-maps/dt={}/delivery-hover-{}.png".format(DT, index)
+def load_map(s3, index, dt):
+    key = "raw/source=coverage-maps/dt={}/delivery-hover-{}.png".format(dt, index)
     body = s3.get_object(Bucket=BUCKET, Key=key)["Body"].read()
     raw = Image.open(io.BytesIO(body)).convert("RGBA")
     canvas = Image.new("RGB", raw.size, (255, 255, 255))
@@ -79,16 +84,12 @@ def load_map(s3, index):
     return key, canvas
 
 
-def main():
-    with open(POINTS, encoding="utf-8") as handle:
-        points = json.load(handle)
-
-    s3 = boto3.client("s3")
+def build_rows(s3, dt, points):
     rows = []
 
     for index in sorted(SORT_CENTERS):
         city, state_code = SORT_CENTERS[index]
-        key, image = load_map(s3, index)
+        key, image = load_map(s3, index, dt)
 
         for state in sorted(points):
             readings = [sample(image, x, y) for x, y in points[state]]
@@ -108,7 +109,7 @@ def main():
                 "split": split,
                 "provenance": "coverage_map_png",
                 "confidence": "inferred_ambiguous" if ambiguous else "inferred",
-                "dt": DT,
+                "dt": dt,
                 "source_key": key,
             })
 
@@ -118,14 +119,17 @@ def main():
         )
         print("{:>2}  {:<16} served {:>2} of {}".format(index, city, served, len(points)))
 
-    fields = [
-        "sort_center", "sort_center_state", "map_index", "state", "outcome",
-        "points_total", "points_agreeing", "split", "provenance", "confidence",
-        "dt", "source_key",
-    ]
+    return rows
+
+
+def main():
+    with open(POINTS, encoding="utf-8") as handle:
+        points = json.load(handle)
+
+    rows = build_rows(boto3.client("s3"), DT, points)
 
     with open(OUT, "w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer = csv.DictWriter(handle, fieldnames=MAP_FIELDS)
         writer.writeheader()
         writer.writerows(rows)
 
