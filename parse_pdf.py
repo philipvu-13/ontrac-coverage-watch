@@ -1,6 +1,7 @@
 import csv
 import re
 import sys
+from datetime import datetime
 
 import pdfplumber
 
@@ -19,9 +20,14 @@ def tier_of(header):
 
 def effective_of(header):
     match = DATE_RE.search(header)
-    if match:
-        return match.group(1).strip()
-    return ""
+    if not match:
+        return ""
+
+    text = match.group(1).strip()
+    try:
+        return datetime.strptime(text, "%B %d, %Y").strftime("%Y-%m-%d")
+    except ValueError:
+        return text
 
 
 def parse(path):
