@@ -1,0 +1,39 @@
+version: 2
+
+models:
+  - name: stg_zip_surcharge
+    columns:
+      - name: zip5
+        data_tests:
+          - not_null
+      - name: tier
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['standard_das', 'extended_das']
+      - name: confidence
+        data_tests:
+          - accepted_values:
+              values: ['confirmed']
+
+  - name: stg_map_coverage
+    columns:
+      - name: state
+        data_tests:
+          - not_null
+      - name: outcome
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['1', '2', '3', '4', '5', '6', '7', 'unserved', 'no_data']
+      - name: confidence
+        data_tests:
+          - accepted_values:
+              values: ['inferred', 'inferred_ambiguous']
+
+  - name: stg_zip_reference
+    columns:
+      - name: zip5
+        data_tests:
+          - not_null
+          - unique

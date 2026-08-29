@@ -9,3 +9,4 @@ iam/snowflake-trust-policy.json
 dbt/target/
 dbt/dbt_packages/
 dbt/logs/
+logs/
