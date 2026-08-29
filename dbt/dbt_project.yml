@@ -1,0 +1,26 @@
+name: ontrac_coverage
+version: 1.0.0
+profile: ontrac
+
+model-paths: ["models"]
+snapshot-paths: ["snapshots"]
+macro-paths: ["macros"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  ontrac_coverage:
+    staging:
+      +materialized: view
+      +schema: staging
+    marts:
+      +materialized: table
+      +schema: marts
+
+snapshots:
+  ontrac_coverage:
+    +target_schema: snapshots

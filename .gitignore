@@ -5,3 +5,7 @@ build/
 function.zip
 build2/
 extract.zip
+iam/snowflake-trust-policy.json
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/

@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: raw
+    database: ontrac
+    schema: raw
+    tables:
+      - name: zip_surcharge
+      - name: map_coverage
+      - name: zip_reference
