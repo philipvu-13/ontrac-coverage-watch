@@ -13,6 +13,11 @@
     },
     {
       "Effect": "Allow",
+      "Action": "secretsmanager:GetSecretValue",
+      "Resource": "arn:aws:secretsmanager:us-east-2:751479507701:secret:ontrac/anthropic-key-c9vg0v"
+    },
+    {
+      "Effect": "Allow",
       "Action": "logs:CreateLogGroup",
       "Resource": "arn:aws:logs:us-east-2:751479507701:*"
     },

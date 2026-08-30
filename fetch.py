@@ -20,6 +20,7 @@ s3 = boto3.client("s3")
 
 MAP_BASE = "https://www.ontrac.com/wp-content/themes/ontrac/assets/images/map/"
 SURCHARGE_PAGE = "https://www.ontrac.com/surchargesandrates/"
+SERVICE_ALERTS = "https://www.ontrac.com/service-alerts/"
 
 
 def get_with_retry(url):
@@ -77,6 +78,13 @@ SOURCES = [
         "min_bytes": 20000,
         "resolve": resolve_zip_pdf_url,
         "resolved_from": SURCHARGE_PAGE,
+    },
+
+        {
+        "slug": "service-alerts",
+        "content_type": "text/html",
+        "min_bytes": 10000,
+        "files": [("document.html", SERVICE_ALERTS)],
     },
 ]
 

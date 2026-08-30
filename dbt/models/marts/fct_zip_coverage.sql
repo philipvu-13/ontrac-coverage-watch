@@ -12,6 +12,7 @@ with map_rows as (
     from {{ ref('stg_map_coverage') }} m
     join {{ ref('stg_zip_reference') }} r
       on r.state = m.state
+    where m.captured_on = (select max(captured_on) from {{ ref('stg_map_coverage') }})
 ),
 
 surcharge_rows as (

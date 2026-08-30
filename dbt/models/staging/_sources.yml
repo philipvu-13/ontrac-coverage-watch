@@ -8,3 +8,5 @@ sources:
       - name: zip_surcharge
       - name: map_coverage
       - name: zip_reference
+      - name: service_alerts
+      - name: service_alerts_parsed

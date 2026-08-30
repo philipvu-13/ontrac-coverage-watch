@@ -1,0 +1,26 @@
+-- INTENDED IMPLEMENTATION, NOT RUNNABLE ON THIS ACCOUNT.
+--
+-- Snowflake restricts Cortex AI functions on trial accounts, so COMPLETE
+-- returns "AI function COMPLETE is not available for trial accounts".
+-- Verified Aug 30 2026 against account EJ69848.
+--
+-- This file is kept with a .disabled extension so dbt does not attempt to
+-- build it. The working implementation runs the same prompt against the
+-- Anthropic API from a Lambda instead. Swapping back to Cortex on a paid
+-- account is a change to one function call, not a redesign.
+
+select
+    captured_on,
+    source_key,
+    try_parse_json(
+        snowflake.cortex.complete(
+            'llama3.1-70b',
+            'Read the OnTrac service alert text below and return only JSON, an array of '
+            || 'objects with the keys event_type, cause, posted_date, states, cities, '
+            || 'and summary. Use null where the text does not say. Text follows. '
+            || alert_text
+        )
+    ) as parsed,
+    'service_alerts_html' as provenance,
+    'llm_extracted' as confidence
+from {{ ref('stg_service_alerts') }}

@@ -1,0 +1,6 @@
+{
+  "Variables": {
+    "ANTHROPIC_KEY_SECRET": "ontrac/anthropic-key",
+    "ANTHROPIC_MODEL": "claude-sonnet-4-5"
+  }
+}
