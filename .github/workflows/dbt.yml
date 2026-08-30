@@ -1,0 +1,41 @@
+name: dbt
+
+on:
+  push:
+    branches: [master]
+  schedule:
+    - cron: "0 14 * * 1"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dbt
+    env:
+      SNOWFLAKE_ACCOUNT: EJ69848.us-east-2.aws
+      SNOWFLAKE_USER: UNCLEPHIL
+      SNOWFLAKE_ROLE: ACCOUNTADMIN
+      SNOWFLAKE_WAREHOUSE: ONTRAC_WH
+      SNOWFLAKE_DATABASE: ONTRAC
+      SNOWFLAKE_KEY_PATH: /home/runner/snowflake_key.p8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dbt
+        run: pip install dbt-snowflake==1.12.0
+
+      - name: Write the Snowflake key
+        env:
+          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+        run: |
+          printf '%s' "$SNOWFLAKE_PRIVATE_KEY" > "$SNOWFLAKE_KEY_PATH"
+          chmod 600 "$SNOWFLAKE_KEY_PATH"
+
+      - name: Build
+        run: dbt build --profiles-dir ci-profiles
