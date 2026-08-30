@@ -1,0 +1,6 @@
+[
+  {
+    "Id": "alert",
+    "Arn": "arn:aws:lambda:us-east-2:751479507701:function:ontrac-coverage-alert"
+  }
+]

@@ -10,3 +10,5 @@ dbt/target/
 dbt/dbt_packages/
 dbt/logs/
 logs/
+build3/
+alert.zip

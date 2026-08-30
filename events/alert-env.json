@@ -1,0 +1,11 @@
+{
+  "Variables": {
+    "SNOWFLAKE_KEY_SECRET": "ontrac/snowflake-key",
+    "ALERT_TOPIC_ARN": "arn:aws:sns:us-east-2:751479507701:ontrac-coverage-alerts",
+    "SNOWFLAKE_ACCOUNT": "EJ69848.us-east-2.aws",
+    "SNOWFLAKE_USER": "UNCLEPHIL",
+    "SNOWFLAKE_ROLE": "ACCOUNTADMIN",
+    "SNOWFLAKE_WAREHOUSE": "ONTRAC_WH",
+    "SNOWFLAKE_DATABASE": "ONTRAC"
+  }
+}
