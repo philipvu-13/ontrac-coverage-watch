@@ -10,21 +10,13 @@ models:
         data_tests:
           - not_null
           - accepted_values:
-              values: ['standard_das', 'extended_das']
+              arguments:
+                values: ['standard_das', 'extended_das']
       - name: confidence
         data_tests:
           - accepted_values:
-              values: ['confirmed']
-  - name: stg_service_alerts_parsed
-    columns:
-      - name: confidence
-        data_tests:
-          - not_null
-          - accepted_values:
-              values: ['llm_extracted']
-      - name: event_type
-        data_tests:
-          - not_null
+              arguments:
+                values: ['confirmed']
 
   - name: stg_map_coverage
     columns:
@@ -35,11 +27,13 @@ models:
         data_tests:
           - not_null
           - accepted_values:
-              values: ['1', '2', '3', '4', '5', '6', '7', 'unserved', 'no_data']
+              arguments:
+                values: ['1', '2', '3', '4', '5', '6', '7', 'unserved', 'no_data']
       - name: confidence
         data_tests:
           - accepted_values:
-              values: ['inferred', 'inferred_ambiguous']
+              arguments:
+                values: ['inferred', 'inferred_ambiguous']
 
   - name: stg_zip_reference
     columns:
@@ -47,3 +41,15 @@ models:
         data_tests:
           - not_null
           - unique
+
+  - name: stg_service_alerts_parsed
+    columns:
+      - name: confidence
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['llm_extracted']
+      - name: event_type
+        data_tests:
+          - not_null

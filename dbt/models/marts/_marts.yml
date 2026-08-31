@@ -10,7 +10,8 @@ models:
         data_tests:
           - not_null
           - accepted_values:
-              values: ['added', 'removed', 'tier_changed']
+              arguments:
+                values: ['added', 'removed', 'tier_changed']
 
   - name: fct_zip_coverage
     columns:
@@ -21,4 +22,5 @@ models:
         data_tests:
           - not_null
           - accepted_values:
-              values: ['confirmed', 'inferred', 'inferred_ambiguous']
+              arguments:
+                values: ['confirmed', 'inferred', 'inferred_ambiguous']
