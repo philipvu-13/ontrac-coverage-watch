@@ -73,7 +73,7 @@ def build_message(rows):
         "",
     ]
 
-    for row in rows:
+    for row in [row for row in rows if row["total_changes"] > 0]:
         lines.append(row["summary"])
         lines.append("Source {}, confidence {}.".format(row["source"], row["confidence"]))
         lines.append("")
@@ -97,21 +97,21 @@ def build_message(rows):
 
 def run():
     rows = fetch_rows()
+    total = sum(row["total_changes"] for row in rows)
 
-    if not rows:
-        print("no changes to report")
-        return {"published": False, "rows": 0}
+    if not rows or total == 0:
+        print("checked {} sources, nothing changed".format(len(rows)))
+        return {"published": False, "rows": len(rows), "total_changes": total}
 
     message = build_message(rows)
-    total = sum(row["total_changes"] for row in rows)
-    subject = "OnTrac coverage changed, {} updates"[:100].format(total)
+    subject = "OnTrac coverage changed, {} updates".format(total)[:100]
 
     boto3.client("sns").publish(
         TopicArn=TOPIC_ARN, Subject=subject, Message=message
     )
 
     print(message)
-    return {"published": True, "rows": len(rows)}
+    return {"published": True, "rows": len(rows), "total_changes": total}
 
 
 def lambda_handler(event, context):

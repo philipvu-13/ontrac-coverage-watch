@@ -1,6 +1,10 @@
 {
   "Variables": {
     "ANTHROPIC_KEY_SECRET": "ontrac/anthropic-key",
-    "ANTHROPIC_MODEL": "claude-sonnet-4-5"
+    "ANTHROPIC_MODEL": "claude-sonnet-4-5",
+    "GITHUB_TOKEN_SECRET": "ontrac/github-token",
+    "GITHUB_REPO": "philipvu-13/ontrac-coverage-watch",
+    "GITHUB_WORKFLOW": "dbt.yml",
+    "GITHUB_BRANCH": "master"
   }
 }

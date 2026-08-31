@@ -14,7 +14,10 @@
     {
       "Effect": "Allow",
       "Action": "secretsmanager:GetSecretValue",
-      "Resource": "arn:aws:secretsmanager:us-east-2:751479507701:secret:ontrac/anthropic-key-c9vg0v"
+      "Resource": [
+        "arn:aws:secretsmanager:us-east-2:751479507701:secret:ontrac/anthropic-key-c9vg0v",
+        "arn:aws:secretsmanager:us-east-2:751479507701:secret:ontrac/github-token-skzyvA"
+      ]
     },
     {
       "Effect": "Allow",

@@ -17,6 +17,11 @@ ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-5")
 ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
 
+GITHUB_SECRET = os.environ.get("GITHUB_TOKEN_SECRET", "ontrac/github-token")
+GITHUB_REPO = os.environ.get("GITHUB_REPO", "philipvu-13/ontrac-coverage-watch")
+GITHUB_WORKFLOW = os.environ.get("GITHUB_WORKFLOW", "dbt.yml")
+GITHUB_BRANCH = os.environ.get("GITHUB_BRANCH", "master")
+
 ALERT_FIELDS = [
     "captured_on", "characters", "provenance", "confidence", "source_key", "alert_text",
 ]
@@ -150,6 +155,28 @@ def parsed_rows(dt, alert_text, source_key):
     return rows
 
 
+def trigger_dbt():
+    secret = boto3.client("secretsmanager").get_secret_value(SecretId=GITHUB_SECRET)
+
+    url = "https://api.github.com/repos/{}/actions/workflows/{}/dispatches".format(
+        GITHUB_REPO, GITHUB_WORKFLOW
+    )
+    headers = {
+        "Authorization": "Bearer {}".format(secret["SecretString"].strip()),
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+    response = requests.post(url, headers=headers, json={"ref": GITHUB_BRANCH}, timeout=30)
+
+    if response.status_code != 204:
+        raise RuntimeError(
+            "github dispatch {} {}".format(response.status_code, response.text[:400])
+        )
+
+    print("dbt workflow dispatched on {}".format(GITHUB_BRANCH))
+
+
 def run(event):
     s3 = boto3.client("s3")
 
@@ -202,6 +229,13 @@ def run(event):
         parsed_count = -1
         print("FAIL alert parse  {}".format(error))
 
+    try:
+        trigger_dbt()
+        dbt_triggered = True
+    except Exception as error:
+        dbt_triggered = False
+        print("FAIL dbt dispatch  {}".format(error))
+
     summary = {
         "bucket": BUCKET,
         "dt_maps": dt_maps,
@@ -211,6 +245,7 @@ def run(event):
         "pdf_rows": len(pdf_rows),
         "alert_characters": alert_rows[0]["characters"],
         "parsed_alerts": parsed_count,
+        "dbt_triggered": dbt_triggered,
         "map_no_data": sum(1 for row in map_rows if row["outcome"] == "no_data"),
         "map_split": sum(1 for row in map_rows if row["split"] == "yes"),
     }
