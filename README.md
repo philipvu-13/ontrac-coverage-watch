@@ -249,6 +249,7 @@ make_map.py            interactive coverage map
 build_zip_ref.py       GeoNames into a pinned ZIP to state reference
 dbt/                   10 models, 1 snapshot, 22 tests
 iam/                   every policy, committed and readable
+sql/                   Snowflake setup and the worked example questions
 spikes/                throwaway exploration, kept as history
 docs/                  the three images above
 ```
