@@ -4,7 +4,7 @@ from collections import defaultdict
 import plotly.graph_objects as go
 
 SRC = "out/map_coverage_rows.csv"
-OUT = "out/coverage_map.html"
+OUT = "docs/coverage_map.html"
 
 ALL_STATES = [
     "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL", "GA", "HI",
@@ -101,5 +101,5 @@ figure.update_layout(
     updatemenus=[dict(buttons=buttons, x=0.02, y=0.95, xanchor="left")],
 )
 
-figure.write_html(OUT)
+figure.write_html(OUT, include_plotlyjs="cdn")
 print("wrote {}".format(OUT))
